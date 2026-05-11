@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Surendra Vattikuti - 3D Portfolio</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+      <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
+}
+        #canvas-container { width: 100vw; height: 100vh; }
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; background: rgba(0,0,0,0.3);
+}
+        #ui {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            pointer-events: none; padding: 40px;
+            color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+        .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .hero h1 { font-size: 4rem; margin-bottom: 20px; animation: slideInLeft 1s ease; }
+        .hero p { font-size: 1.5rem; margin-bottom: 30px; opacity: 0.9; }
+        .hero button {
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 15px 40px; border-radius: 50px;
+            font-size: 1rem; cursor: pointer; pointer-events: all;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: fit-content; margin-top: 20px;
+        }
+        .hero button:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .footer { display: flex; gap: 20px; pointer-events: all; }
+        .footer a {
+                      color: white; text-decoration: none; padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .footer a:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        .section { margin-top: 40px; }
+        .section h2 { font-size: 2rem; margin-bottom: 20px; }
+        .projects, .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .project-card {
+                      background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+}
+        .skill-badge { display: inline-block; background: rgba(102, 126, 234, 0.3); padding: 8px 16px; border-radius: 20px; margin: 5px; }
+        @keyframes slideInLeft { from { transform: translateX(-100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            #ui { padding: 20px; }
+}
+    </style>
+      </head>
+      <body>
+          <div id="canvas-container"></div>
+          <div id="overlay"></div>
+          <div id="ui">
+              <div class="hero">
+                  <h1>Surendra Vattikuti</h1>
+                  <p>Senior Cloud & DevOps Engineer | 3D Portfolio Experience</p>
+                  <button onclick="scrollToSection('about')">Explore My Work</button>
+        </div>
+        <div class="footer">
+            <a href="https://github.com/surendravattikuti01-coder" target="_blank">GitHub</a>
+                  <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+                  <a href="mailto:your-email@example.com">Email</a>
+              </div>
+          </div>
+
+          <script>
+              // Three.js Scene Setup
+              const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x0f0c29, 0.1);
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(50, 50, 50);
+        scene.add(directionalLight);
+
+        // Create Golden Gate Bridge
+        const bridgeGroup = new THREE.Group();
+        scene.add(bridgeGroup);
+
+        // Main Span
+        const spanGeometry = new THREE.BoxGeometry(4, 0.3, 2);
+        const spanMaterial = new THREE.MeshStandardMaterial({ color: 0xc41e3a, metalness: 0.6, roughness: 0.3 });
+        const span = new THREE.Mesh(spanGeometry, spanMaterial);
+        span.position.z = 0;
+        bridgeGroup.add(span);
+
+        // Towers
+        for (let i = -2; i <= 2; i += 4) {
+            const towerGeometry = new THREE.BoxGeometry(0.2, 3, 0.2);
+            const tower = new THREE.Mesh(towerGeometry, spanMaterial);
+            tower.position.set(i, 1.5, 0);
+            bridgeGroup.add(tower);
+        }
+
+        // Cables
+        const cableGroup = new THREE.Group();
+        for (let i = 0; i < 10; i++) {
+            const cableGeometry = new THREE.BoxGeometry(0.05, 2, 0.05);
+            const cable = new THREE.Mesh(cableGeometry, spanMaterial);
+            cable.position.set(-2 + i * 0.45, 1, 0.5);
+            cableGroup.add(cable);
+        }
+        bridgeGroup.add(cableGroup);
+
+        // Water
+        const waterGeometry = new THREE.PlaneGeometry(100, 100);
+        const waterMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1e90ff, 
+            metalness: 0.3, 
+            roughness: 0.7,
+            wireframe: false 
+});
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.rotation.x = -Math.PI / 2;
+        water.position.y = -2;
+        scene.add(water);
+
+        // Camera position
+        camera.position.set(0, 2, 6);
+        camera.lookAt(0, 1, 0);
+
+        // Animation
+        let time = 0;
+        function animate() {
+                      requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rotate bridge
+            bridgeGroup.rotation.y = Math.sin(time * 0.5) * 0.3;
+            bridgeGroup.rotation.x = Math.sin(time * 0.3) * 0.1;
+
+            // Water waves
+            water.material.color.setHSL(0.6, 0.5, 0.3 + Math.sin(time * 0.5) * 0.1);
+
+            // Camera movement
+            camera.position.x = Math.sin(time * 0.3) * 3;
+            camera.position.z = 4 + Math.cos(time * 0.2) * 2;
+            camera.lookAt(0, 1, 0);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+                      camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+        function scrollToSection(id) {
+                      console.log('Scrolling to:', id);
+        }
+    </script>
+      </body>
+      </html>
