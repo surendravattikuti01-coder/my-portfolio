@@ -1,0 +1,5 @@
+{
+    "buildCommand": "bash SETUP_SCRIPT.sh && npm run build",
+    "outputDirectory": "dist",
+    "framework": "vite"
+}
